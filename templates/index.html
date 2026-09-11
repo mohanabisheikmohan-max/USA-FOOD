@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USA Food Study Assistant</title>
+    <style>
+        :root {
+            --bg: #090d14;
+            --panel: rgba(17, 23, 34, 0.88);
+            --panel-soft: rgba(255, 255, 255, 0.035);
+            --line: rgba(255,255,255,.09);
+            --text: #f5f7fb;
+            --muted: #9aa5b8;
+            --accent: #4ea3ff;
+            --accent-2: #ef6461;
+            --user: #18324d;
+            --bot: #171e2a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 12% 8%, rgba(78,163,255,.16), transparent 28%),
+                radial-gradient(circle at 88% 88%, rgba(239,100,97,.10), transparent 30%),
+                var(--bg);
+        }
+
+        .app {
+            width: min(1180px, 94vw);
+            height: min(780px, 92vh);
+            margin: 4vh auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--panel);
+            backdrop-filter: blur(22px);
+            box-shadow: 0 30px 100px rgba(0,0,0,.45);
+        }
+
+        aside {
+            padding: 24px 18px;
+            border-right: 1px solid var(--line);
+            background: rgba(7,10,16,.42);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 46px;
+            height: 46px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #ef6461, #4ea3ff);
+            font-size: 22px;
+            box-shadow: 0 12px 30px rgba(78,163,255,.18);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.25;
+        }
+
+        .brand span {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .section-label {
+            margin: 0 8px 10px;
+            color: #68748a;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .topics {
+            display: grid;
+            gap: 7px;
+        }
+
+        .topic {
+            border: 1px solid transparent;
+            border-radius: 13px;
+            padding: 11px 12px;
+            color: #c9d1df;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .topic:hover {
+            border-color: var(--line);
+            background: var(--panel-soft);
+            transform: translateX(2px);
+        }
+
+        .topic b { display: block; font-size: 12px; }
+        .topic small { color: #748096; font-size: 10px; }
+
+        .scope {
+            margin-top: auto;
+            padding: 14px;
+            border: 1px solid rgba(78,163,255,.2);
+            border-radius: 17px;
+            background: rgba(78,163,255,.07);
+        }
+
+        .scope strong { font-size: 11px; }
+        .scope p {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        main {
+            min-width: 0;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+
+        header {
+            min-height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #69e6a3;
+            box-shadow: 0 0 0 5px rgba(105,230,163,.08);
+        }
+
+        .status strong { font-size: 13px; }
+        .status span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .model {
+            padding: 7px 10px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: #cbd4e2;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .08em;
+        }
+
+        #chat {
+            overflow-y: auto;
+            padding: 30px clamp(18px, 5vw, 60px);
+            scroll-behavior: smooth;
+        }
+
+        .welcome {
+            max-width: 670px;
+            margin: 8vh auto 0;
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 18px;
+            display: grid;
+            place-items: center;
+            border-radius: 25px;
+            background: linear-gradient(145deg, rgba(239,100,97,.16), rgba(78,163,255,.14));
+            border: 1px solid rgba(78,163,255,.2);
+            font-size: 35px;
+        }
+
+        .welcome h2 {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 39px);
+            letter-spacing: -.045em;
+        }
+
+        .welcome p {
+            margin: 12px auto 24px;
+            max-width: 530px;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 9px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: #cbd3df;
+            background: rgba(255,255,255,.025);
+            cursor: pointer;
+            font-size: 11px;
+            transition: .2s ease;
+        }
+
+        .chip:hover {
+            background: rgba(78,163,255,.09);
+            border-color: rgba(78,163,255,.28);
+        }
+
+        .message {
+            display: flex;
+            gap: 11px;
+            margin: 0 auto 20px;
+            max-width: 760px;
+            animation: rise .22s ease;
+        }
+
+        .message.user { justify-content: flex-end; }
+        .message.user .avatar { order: 2; }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: #202837;
+            font-size: 14px;
+        }
+
+        .message.user .avatar {
+            background: #294766;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .bubble {
+            max-width: min(78%, 650px);
+            padding: 12px 15px;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: var(--bot);
+            color: #e9edf4;
+            font-size: 13px;
+            line-height: 1.65;
+            white-space: pre-wrap;
+        }
+
+        .message.user .bubble {
+            background: var(--user);
+            border-color: rgba(110,170,225,.16);
+        }
+
+        .composer {
+            padding: 16px 24px 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        .input-wrap {
+            display: flex;
+            align-items: flex-end;
+            gap: 9px;
+            max-width: 820px;
+            margin: auto;
+            padding: 8px 8px 8px 15px;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: rgba(7,10,15,.78);
+            box-shadow: 0 10px 35px rgba(0,0,0,.18);
+        }
+
+        textarea {
+            flex: 1;
+            min-height: 38px;
+            max-height: 130px;
+            resize: none;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--text);
+            font: inherit;
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 8px 0;
+        }
+
+        textarea::placeholder { color: #687489; }
+
+        #send {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            border: 0;
+            border-radius: 13px;
+            background: var(--accent);
+            color: #07111c;
+            cursor: pointer;
+            font-weight: 900;
+            transition: .2s ease;
+        }
+
+        #send:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.07);
+        }
+
+        #send:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hint {
+            margin: 8px 0 0;
+            text-align: center;
+            color: #586477;
+            font-size: 9px;
+        }
+
+        .typing {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing i {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #9099aa;
+            animation: pulse 1s infinite ease-in-out;
+        }
+
+        .typing i:nth-child(2) { animation-delay: .15s; }
+        .typing i:nth-child(3) { animation-delay: .3s; }
+
+        @keyframes pulse {
+            50% { opacity: .25; transform: translateY(-2px); }
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(5px); }
+        }
+
+        @media (max-width: 780px) {
+            .app {
+                width: 100%;
+                height: 100vh;
+                margin: 0;
+                border: 0;
+                border-radius: 0;
+                grid-template-columns: 1fr;
+            }
+
+            aside { display: none; }
+            header { padding: 16px 18px; }
+            .model { display: none; }
+            #chat { padding: 24px 16px; }
+            .bubble { max-width: 86%; }
+            .composer { padding: 12px 12px 15px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <aside>
+        <div class="brand">
+            <div class="logo">🍔</div>
+            <div>
+                <h1>USA Food<br>Study Assistant</h1>
+                <span>Focused learning companion</span>
+            </div>
+        </div>
+
+        <p class="section-label">Explore</p>
+        <div class="topics">
+            <button class="topic" data-prompt="Explain major regional food traditions in the United States.">
+                <b>Regional cuisines</b><small>Food traditions across America</small>
+            </button>
+            <button class="topic" data-prompt="Explain important ingredients and cooking techniques used in American cuisine.">
+                <b>Ingredients & techniques</b><small>Culinary foundations</small>
+            </button>
+            <button class="topic" data-prompt="Explain important American holiday foods and their cultural meanings.">
+                <b>Holiday foods</b><small>Culture, history & food</small>
+            </button>
+            <button class="topic" data-prompt="Explain the history and role of barbecue in American food culture.">
+                <b>American barbecue</b><small>Regional styles & methods</small>
+            </button>
+            <button class="topic" data-prompt="Explain the food science behind deep-frying in American cooking.">
+                <b>Food science</b><small>The science behind cooking</small>
+            </button>
+        </div>
+
+        <div class="scope">
+            <strong>🎯 Focus mode</strong>
+            <p>This assistant answers USA food and directly related study questions only.</p>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="status">
+                <div class="dot"></div>
+                <div>
+                    <strong>USA Food Study Assistant</strong>
+                    <span>Ready for a food-focused question</span>
+                </div>
+            </div>
+            <div class="model">GEMINI 3.1 FLASH-LITE</div>
+        </header>
+
+        <section id="chat">
+            <div class="welcome" id="welcome">
+                <div class="welcome-icon">🍟</div>
+                <h2>Explore American food,<br>one question at a time.</h2>
+                <p>Study American cuisine, ingredients, cooking methods, regional traditions, food history, culture, and related food science.</p>
+                <div class="chips">
+                    <button class="chip" data-prompt="What are the major regional cuisines of the United States?">Regional cuisines</button>
+                    <button class="chip" data-prompt="How does deep-frying work from a food science perspective?">Frying science</button>
+                    <button class="chip" data-prompt="What are some important American holiday foods and their meanings?">Holiday foods</button>
+                    <button class="chip" data-prompt="Explain the main regional styles of American barbecue.">Barbecue</button>
+                </div>
+            </div>
+        </section>
+
+        <div class="composer">
+            <div class="input-wrap">
+                <textarea id="message" rows="1" placeholder="Ask about USA food or related study..."></textarea>
+                <button id="send" aria-label="Send message">➤</button>
+            </div>
+            <p class="hint">USA food & related study only · Enter to send · Shift + Enter for a new line</p>
+        </div>
+    </main>
+</div>
+
+<script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("message");
+    const send = document.getElementById("send");
+    const welcome = document.getElementById("welcome");
+
+    function addMessage(text, role) {
+        if (welcome) welcome.remove();
+
+        const row = document.createElement("div");
+        row.className = `message ${role}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = role === "user" ? "You" : "🍔";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = text;
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chat.appendChild(row);
+        chat.scrollTop = chat.scrollHeight;
+        return row;
+    }
+
+    function addTyping() {
+        const row = document.createElement("div");
+        row.className = "message bot";
+        row.id = "typing";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar";
+        avatar.textContent = "🍔";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chat.appendChild(row);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function sendMessage(text = input.value.trim()) {
+        if (!text || send.disabled) return;
+
+        input.value = "";
+        input.style.height = "auto";
+        addMessage(text, "user");
+        addTyping();
+        send.disabled = true;
+
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            document.getElementById("typing")?.remove();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Request failed.");
+            }
+
+            addMessage(data.reply, "bot");
+        } catch (error) {
+            document.getElementById("typing")?.remove();
+            addMessage(error.message || "Something went wrong. Please try again.", "bot");
+        } finally {
+            send.disabled = false;
+            input.focus();
+        }
+    }
+
+    send.addEventListener("click", () => sendMessage());
+
+    input.addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    });
+
+    input.addEventListener("input", () => {
+        input.style.height = "auto";
+        input.style.height = Math.min(input.scrollHeight, 130) + "px";
+    });
+
+    document.querySelectorAll("[data-prompt]").forEach(button => {
+        button.addEventListener("click", () => sendMessage(button.dataset.prompt));
+    });
+</script>
+</body>
+</html>
